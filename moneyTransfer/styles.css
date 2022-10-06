@@ -1,0 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+body {
+    height: 100%;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+}
+
+.modal-wrap {
+    position: fixed;
+    display: flex;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: none;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-auth {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    width: 500px;
+    height: 500px;
+    background-color: white;
+    justify-content: center;
+    align-items: center;
+    /* border: 1px  solid; */
+    border-radius: 3%;
+}
+
