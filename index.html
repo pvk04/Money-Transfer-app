@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money transfer</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="web3_min.js" defer></script>
+    <script src="main.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <h1 class="account"></h1>
+        <p class="balance"></p>
+        <p>Введите адрес кошелька:</p>
+        <input type="text" list="address" class="address">
+        <datalist id="address"></datalist>
+    </header>
+    
+    <main>
+        <button class="test">test</button>
+    </main>
+
+
+    <div class="modal-wrap">
+        <div class="modal-auth">
+            <h1>Login or register</h1>
+            <form>
+                <p>Address:</p>
+                <input type="text" name="" class="authAddress">
+                <p>Password:</p>
+                <input type="text" name="" class="authPassword">
+                <button class="regBtn">Register</button>
+                <button class="loginBtn">Login</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
