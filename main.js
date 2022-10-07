@@ -376,23 +376,32 @@ btnReg.addEventListener("click", async (e)=>{
 	let addressValue = addressAuthInp.value;
 	let passwordAuthInp = document.querySelector(".authPassword");
 	let passwordValue = passwordAuthInp.value;
-	console.log(passwordValue)
-	let test = web3.eth.abi.encodeParameter('bytes32', passwordValue);
-	console.log(test)
 	
-	// await contractInstanse.methods.registration(addressValue, passwordValue).send({from: addressValue}, function(error, result){
-    // 	console.log("registration error: ", error);
-	// 	console.log("result: ", result);
-	// });
+	await contractInstanse.methods.registration(addressValue, passwordValue).send({from: addressValue}, function(error, result){
+    	console.log("registration error: ", error);
+		console.log("result: ", result);
+	});
+
+	//закрытие модалки и присвоение адреса в переменную account
 });
 
 //LOGIN
 let btnLogin = document.querySelector(".loginBtn");
-btnLogin.addEventListener("click", (e)=>{
+btnLogin.addEventListener("click", async (e)=>{
 	e.preventDefault();
 	let addressAuthInp = document.querySelector(".authAddress");
 	let addressValue = addressAuthInp.value;
 	let passwordAuthInp = document.querySelector(".authPassword");
 	let passwordValue = passwordAuthInp.value;
 
+	let resp = await contractInstanse.methods.auth(addressValue, passwordValue).call({from: addressValue}, function(error, result){
+    	console.log("registration error: ", error);
+		console.log("result: ", result);
+	});
+	
+	if (resp == true){
+		let modalAuth = document.querySelector("#modal-auth");
+		modalAuth.style.display = "none";
+		account = addressValue;
+	}
 })
