@@ -1,315 +1,8 @@
-const contractAddress = "0xF5F28b843B91666231E968aE13D17b7FF3f389e1";
+import abi from "./abi.js";
 
-const abi = [
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "id_transaction",
-				"type": "uint256"
-			}
-		],
-		"name": "cancelTransaction",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "receiver",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount_money",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "codeword",
-				"type": "bytes32"
-			},
-			{
-				"internalType": "uint256",
-				"name": "pattern",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "safe_transfer",
-				"type": "bool"
-			}
-		],
-		"name": "createTransaction",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "proposedRole",
-				"type": "uint256"
-			}
-		],
-		"name": "nominate",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "id_transaction",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "codeword",
-				"type": "bytes32"
-			}
-		],
-		"name": "receiveTransaction",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "login",
-				"type": "address"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "password",
-				"type": "bytes32"
-			}
-		],
-		"name": "registration",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "adminVote",
-				"type": "uint256"
-			}
-		],
-		"name": "vote",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "login",
-				"type": "address"
-			},
-			{
-				"internalType": "bytes32",
-				"name": "password",
-				"type": "bytes32"
-			}
-		],
-		"name": "auth",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			}
-		],
-		"name": "checkAttempts",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "text",
-				"type": "string"
-			}
-		],
-		"name": "convert",
-		"outputs": [
-			{
-				"internalType": "bytes32",
-				"name": "",
-				"type": "bytes32"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			}
-		],
-		"name": "showCategory",
-		"outputs": [
-			{
-				"components": [
-					{
-						"internalType": "uint256",
-						"name": "number",
-						"type": "uint256"
-					},
-					{
-						"internalType": "string",
-						"name": "name",
-						"type": "string"
-					}
-				],
-				"internalType": "struct Storage.Category",
-				"name": "",
-				"type": "tuple"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "pattern_id",
-				"type": "uint256"
-			}
-		],
-		"name": "showPattern",
-		"outputs": [
-			{
-				"components": [
-					{
-						"internalType": "uint256",
-						"name": "category",
-						"type": "uint256"
-					},
-					{
-						"internalType": "string",
-						"name": "name",
-						"type": "string"
-					},
-					{
-						"internalType": "uint256",
-						"name": "money",
-						"type": "uint256"
-					}
-				],
-				"internalType": "struct Storage.TransferPattern",
-				"name": "",
-				"type": "tuple"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "admin",
-				"type": "address"
-			}
-		],
-		"name": "showVoting",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "users",
-		"outputs": [
-			{
-				"internalType": "bytes32",
-				"name": "password",
-				"type": "bytes32"
-			},
-			{
-				"internalType": "uint256",
-				"name": "role",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-];
+const contractAddress = "0x279657399Db39490B401e56d2b95cf80324132D5";
 
-let web3, contractInstanse, account;
+let web3, contractInstanse, account, accountRole, categories;
 
 function network() {
 	web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
@@ -318,90 +11,285 @@ function network() {
 }
 network();
 
-async function getAccount() {
-	let accounts = await web3.eth.getAccounts();
-	return accounts;
-}
-getAccount().then((accounts) => {
-	const accountsList = document.querySelector("#address");
-	for (acc of accounts) {
-		let opt = document.createElement("option");
-		opt.value = acc;
-		opt.innerHTML = acc;
-		accountsList.append(opt);
-	}
-	let input = document.querySelector(".address");
-	input.addEventListener("input", () => {
-		let accountContainer = document.querySelector(".account");
-		accountContainer.innerHTML = input.value;
-		account = input.value;
-		getBalance(account);
-	});
-});
-
 async function getBalance(account) {
-	let balanceContainer = document.querySelector(".balance");
-	try {
-		let balance = await web3.eth.getBalance(account);
-		balanceContainer.innerHTML = `Ваш баланс: ${web3.utils.fromWei(
-			balance,
-			"ether"
-		)} eth`;
-	} catch (err) {
-		balanceContainer.innerHTML = "Ошибка: " + err.message;
-	}
+	let balance = await web3.eth.getBalance(account);
+	balance = await web3.utils.fromWei(balance, "ether");
+	let accountBalanceLab = document.querySelector(".account-balance");
+	accountBalanceLab.innerHTML = `Balance: ${balance} eth`;
 }
-
-// async function callTest() {
-// 	let mts = await contractInstanse.methods
-// 		.showCategory(0)
-// 		.call({ from: account }, (result) => {
-//             console.log(result);
-// 		});
-// 	console.log(mts);
-// }
-
-// let test = document.querySelector(".test");
-// test.addEventListener("click", () => {
-// 	callTest();
-// });
-
 
 // REGISTRATION
 let btnReg = document.querySelector(".regBtn");
-btnReg.addEventListener("click", async (e)=>{
+btnReg.addEventListener("click", async (e) => {
 	e.preventDefault();
 
 	let addressAuthInp = document.querySelector(".authAddress");
 	let addressValue = addressAuthInp.value;
 	let passwordAuthInp = document.querySelector(".authPassword");
-	let passwordValue = passwordAuthInp.value;
-	
-	await contractInstanse.methods.registration(addressValue, passwordValue).send({from: addressValue}, function(error, result){
-    	console.log("registration error: ", error);
-		console.log("result: ", result);
+	let passwordValue = web3.utils.soliditySha3({
+		type: "string",
+		value: passwordAuthInp.value,
 	});
 
-	//закрытие модалки и присвоение адреса в переменную account
+	await contractInstanse.methods
+		.registration(addressValue, passwordValue)
+		.send({ from: addressValue }, function (error, result) {
+			console.log("registration error: ", error);
+			console.log("result: ", result);
+			if (error === null) {
+				alert("You have successfully registered!");
+			}
+		});
 });
 
 //LOGIN
-let btnLogin = document.querySelector(".loginBtn");
-btnLogin.addEventListener("click", async (e)=>{
-	e.preventDefault();
+let btnLogin = document.querySelector(".login");
+btnLogin.addEventListener("click", async (event) => {
+	event.preventDefault();
 	let addressAuthInp = document.querySelector(".authAddress");
 	let addressValue = addressAuthInp.value;
 	let passwordAuthInp = document.querySelector(".authPassword");
-	let passwordValue = passwordAuthInp.value;
-
-	let resp = await contractInstanse.methods.auth(addressValue, passwordValue).call({from: addressValue}, function(error, result){
-    	console.log("registration error: ", error);
-		console.log("result: ", result);
+	let passwordValue = web3.utils.soliditySha3({
+		type: "string",
+		value: passwordAuthInp.value,
 	});
-	
-	if (resp == true){
-		let modalAuth = document.querySelector("#modal-auth");
-		modalAuth.style.display = "none";
-		account = addressValue;
+
+	try {
+		let resp = await contractInstanse.methods
+			.auth(addressValue, passwordValue)
+			.call({ from: addressValue }, function (error, result) {
+				console.log("registration error: ", error);
+				console.log("result: ", result);
+			});
+		if (resp == true) {
+			let modalAuth = document.querySelector("#modal-auth");
+			account = addressValue;
+			accountRole = await contractInstanse.methods
+				.showRole(account)
+				.call({ from: account });
+			console.log(accountRole);
+			modalAuth.style.display = "none";
+			localStorage.setItem(
+				"accountinfo",
+				JSON.stringify({ account, accountRole })
+			);
+			passwordAuthInp.value = "";
+			main();
+		}
+	} catch (error) {
+		alert(error.name);
 	}
-})
+});
+
+async function main() {
+	let modalAuth = document.querySelector("#modal-auth");
+	if (JSON.parse(localStorage.getItem("accountinfo")) != undefined) {
+		let accInfo = JSON.parse(localStorage.getItem("accountinfo"));
+		account = accInfo.account;
+		accountRole = accInfo.accountRole;
+	} else {
+		modalAuth.style.display = "flex";
+	}
+
+	let accountAddressLab = document.querySelector(".account-address");
+	accountAddressLab.innerHTML = `Address: ${account}`;
+
+	let accountRoleLab = document.querySelector(".account-role");
+	accountRoleLab.innerHTML = `Role: ${accountRole == 1 ? "admin" : "user"}`;
+
+	let createTransferBtn = document.querySelector(".create-transfer");
+	createTransferBtn.addEventListener("click", createTransfer);
+
+	let exitBtn = document.querySelector(".exit");
+	exitBtn.addEventListener("click", () => {
+		console.log(21);
+		localStorage.removeItem("accountinfo");
+		modalAuth.style.display = "flex";
+	});
+
+	getBalance(account);
+	renderHistory(await getTransactions());
+}
+main();
+
+async function createTransfer() {
+	let modal = document.querySelector("#modal-create-transfer");
+	modal.style.display = "flex";
+	let close = document.querySelector(".close-modal");
+	let transfer = document.querySelector(".transfer");
+	let safeTransferBtn = document.querySelector(".safe-transfer");
+	let categoriesSelect = document.querySelector("#category");
+	let patternsSelect = document.querySelector("#pattern");
+	let recieverInp = document.querySelector(".reciever");
+	let amountMoneyInp = document.querySelector(".money");
+	let codewordInp = document.querySelector(".codeword");
+	let safeTransfer = false;
+	let currentCategory, currentPattern;
+	categories = await contractInstanse.methods
+		.showCategories()
+		.call({ from: account });
+	let patterns = await contractInstanse.methods
+		.showPatterns()
+		.call({ from: account });
+
+	close.addEventListener("click", () => {
+		modal.style.display = "none";
+	});
+
+	categoriesSelect.innerHTML = "<option value=''>Select category</option>";
+	for (let elem of categories) {
+		let opt = document.createElement("option");
+		opt.innerHTML = elem[1];
+		opt.value = elem[0];
+		categoriesSelect.append(opt);
+	}
+
+	categoriesSelect.addEventListener("change", (event) => {
+		currentCategory = event.target.value;
+		patternsSelect.innerHTML = "<option value=''>...</option>";
+		let currentPatternId = -1;
+		for (let elem of patterns) {
+			currentPatternId++;
+			if (elem[0] == currentCategory) {
+				let opt = document.createElement("option");
+				opt.innerHTML = `${elem[1]}: ${elem[2]} coins`;
+				opt.value = currentPatternId;
+				patternsSelect.append(opt);
+			}
+		}
+	});
+
+	patternsSelect.addEventListener("change", (event) => {
+		currentPattern = patterns[event.target.value];
+		amountMoneyInp.value = currentPattern ? currentPattern[2] : "";
+	});
+
+	safeTransferBtn.addEventListener("click", () => {
+		if (safeTransfer == false) {
+			safeTransfer = true;
+		} else {
+			safeTransfer = false;
+		}
+	});
+
+	transfer.addEventListener("click", async (event) => {
+		event.preventDefault();
+		let to = recieverInp.value;
+		let money = web3.utils.toWei(amountMoneyInp.value, "wei");
+		let codeword = await web3.utils.soliditySha3({
+			type: "string",
+			value: codewordInp.value,
+		});
+		try {
+			await contractInstanse.methods
+				.createTransaction(
+					to,
+					money,
+					codeword,
+					currentCategory,
+					safeTransfer
+				)
+				.send({ value: money, from: account, gas: "6721975" });
+			alert("Transaction succesfully created");
+			getBalance(account);
+		} catch (err) {
+			console.log(err.message);
+			getBalance(account);
+		}
+	});
+}
+
+async function getTransactions() {
+	let transactions = await contractInstanse.methods
+		.showTransactions()
+		.call({ from: account });
+	return transactions;
+}
+
+function renderHistory(array) {
+	let ul = document.querySelector(".content-list");
+	ul.innerHTML = "";
+	let typeSelector = document.querySelector(".history-type");
+
+	for (let elem of array) {
+		if (elem[0] == account || elem[1] == account) {
+			renderHistoryElem(elem);
+		}
+	}
+
+	typeSelector.addEventListener("change", (e) => {
+		let type = e.target.value;
+		ul.innerHTML = "";
+		switch (type) {
+			case "all":
+				for (let elem of array) {
+					if (elem[0] == account || elem[1] == account) {
+						renderHistoryElem(elem);
+					}
+				}
+				break;
+			case "in":
+				for (let elem of array) {
+					if (elem[1] == account) {
+						renderHistoryElem(elem);
+					}
+				}
+				break;
+			case "out":
+				for (let elem of array) {
+					if (elem[0] == account) {
+						renderHistoryElem(elem);
+					}
+				}
+				break;
+		}
+	});
+}
+
+function renderHistoryElem(elem) {
+	let ul = document.querySelector(".content-list");
+	let li = document.createElement("li");
+	li.classList.add("content-elem");
+
+	li.innerHTML = `
+	<div class="content">
+		<p>From: ${elem[0]}</p>
+		<p>To: ${elem[1]}</p>
+		<p>${elem[2]}</p>
+		<p>Attempts left: ${elem[4]}</p>
+		<p>Category: ${elem[5]}</p>
+		${statusRender(elem)}
+		${safeTransferRender(elem)}
+		<p>Created: ${elem[9]}</p>
+		${recieveAtRender(elem)}
+	</div>
+	`;
+	ul.append(li);
+}
+
+function statusRender(elem) {
+	if (elem[8] == 0) {
+		return "<p>Status: Not done yet</p>";
+	} else if (elem[8] == 1) {
+		return "<p>Status: Done</p>";
+	} else if (elem[8] == 2) {
+		return "<p>Status: Canceled</p>";
+	} else if (elem[8] == 3) {
+		return "<p>Status: Code word entered incorrectly</p>";
+	}
+}
+
+function safeTransferRender(elem) {
+	if (elem[6] == true) {
+		return `<p>Safe transfer</p>
+		<p>Confirmed: ${elem[7]}</p>`;
+	}
+	return "";
+}
+
+function recieveAtRender(elem) {
+	if (elem[10] != 0) {
+		return `<p>Recieved at: ${elem[10]}</p>`;
+	}
+	return "";
+}
