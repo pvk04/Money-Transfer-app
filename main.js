@@ -2,7 +2,7 @@ import abi from "./abi.js";
 
 const contractAddress = "0x279657399Db39490B401e56d2b95cf80324132D5";
 
-let web3, contractInstanse, account, accountRole, categories;
+let web3, contractInstanse, account, accountRole;
 
 function network() {
 	web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
@@ -125,7 +125,7 @@ async function createTransfer() {
 	let codewordInp = document.querySelector(".codeword");
 	let safeTransfer = false;
 	let currentCategory, currentPattern;
-	categories = await contractInstanse.methods
+	let categories = await contractInstanse.methods
 		.showCategories()
 		.call({ from: account });
 	let patterns = await contractInstanse.methods
@@ -172,7 +172,7 @@ async function createTransfer() {
 		}
 	});
 
-	transfer.addEventListener("click", async (event) => {
+	transfer.onclick = async (event) => {
 		event.preventDefault();
 		let to = recieverInp.value;
 		let money = web3.utils.toWei(amountMoneyInp.value, "wei");
@@ -192,11 +192,12 @@ async function createTransfer() {
 				.send({ value: money, from: account, gas: "6721975" });
 			alert("Transaction succesfully created");
 			getBalance(account);
+			renderHistory(await getTransactions());
 		} catch (err) {
 			console.log(err.message);
 			getBalance(account);
 		}
-	});
+	};
 }
 
 async function getTransactions() {
@@ -246,21 +247,23 @@ function renderHistory(array) {
 	});
 }
 
-function renderHistoryElem(elem) {
+async function renderHistoryElem(elem) {
+	let categories = await contractInstanse.methods
+		.showCategories()
+		.call({ from: account });
 	let ul = document.querySelector(".content-list");
 	let li = document.createElement("li");
 	li.classList.add("content-elem");
-
 	li.innerHTML = `
 	<div class="content">
 		<p>From: ${elem[0]}</p>
 		<p>To: ${elem[1]}</p>
 		<p>${elem[2]}</p>
 		<p>Attempts left: ${elem[4]}</p>
-		<p>Category: ${elem[5]}</p>
+		<p>Category: ${categories[elem[5]][1]}</p>
 		${statusRender(elem)}
 		${safeTransferRender(elem)}
-		<p>Created: ${elem[9]}</p>
+		<p>Created: ${convertToDate(elem[9])}</p>
 		${recieveAtRender(elem)}
 	</div>
 	`;
@@ -289,7 +292,29 @@ function safeTransferRender(elem) {
 
 function recieveAtRender(elem) {
 	if (elem[10] != 0) {
-		return `<p>Recieved at: ${elem[10]}</p>`;
+		return `<p>Recieved at: ${convertToDate(elem[10])}</p>`;
 	}
 	return "";
+}
+
+function convertToDate(timestamp) {
+	const result = new Date(timestamp * 1000);
+
+	return `${
+		String(result.getDate()).length < 2
+			? "0" + result.getDate()
+			: result.getDate()
+	}.${
+		String(result.getMonth() + 1).length < 2
+			? "0" + result.getMonth() + 1
+			: result.getMonth() + 1
+	}.${result.getFullYear()} ${
+		String(result.getHours() + 1).length < 2
+			? "0" + result.getHours()
+			: result.getHours()
+	}:${
+		String(result.getMinutes()).length < 2
+			? "0" + result.getMinutes()
+			: result.getMinutes()
+	}`;
 }
