@@ -24,28 +24,12 @@
     <main class="main-body">
         <nav class="nav-wrap">
             <ul class="nav-list">
-                <li class="nav-elem">
+                <li class="nav-elem transaction-hist">
                     Transaction history
-                </li>
-                <li class="nav-elem">
-                    Votings
                 </li>
             </ul>
         </nav>
-        <div class="main-content">
-            <header class="history-header">
-                <div class="history-header-content">
-                    <p>Type: </p>
-                    <select name="type" class="history-type">
-                        <option value="all">All</option>
-                        <option value="in">Incoming</option>
-                        <option value="out">Outgoing</option>
-                    </select>
-                    <p class="done">Completed<input type="checkbox"></p>                    
-                </div>
-            </header>
-            <div class="content"></div>
-        </div>
+        <div class="main-content"></div>
     </main>
 
     <!-- Модалка авторизации -->
@@ -131,6 +115,7 @@
                     <button class="loginBtn enter-codeword">Enter</button>
                     </div>
                 </form>
+                <button class="close-modal"><img src="./assets/close.svg" alt=""></button>
             </div>
         </div>
     </div>

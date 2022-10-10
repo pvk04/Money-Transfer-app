@@ -1,6 +1,6 @@
 import abi from "./abi.js";
 
-const contractAddress = "0x5915edd6F74C6613A359a876466bDbbd7CF6DdD4";
+const contractAddress = "0x4982786d536A9A910F635BB308a48086c9F2f54f";
 
 let web3, contractInstanse, account, accountRole;
 
@@ -107,6 +107,22 @@ async function main() {
 		modalAuth.style.display = "flex";
 	});
 
+	let transactionHistory = document.querySelector(".transaction-hist");
+	transactionHistory.onclick = async () => {
+		renderHistory(await getTransactions());
+	};
+
+	if (accountRole == 1) {
+		let menu = document.querySelector(".nav-list");
+		let categories = document.createElement("li");
+		categories.classList.add("nav-elem");
+		categories.innerHTML = "Categories";
+		menu.append(categories);
+		categories.onclick = async () => {
+			await renderCategoriesPage();
+		};
+	}
+
 	getBalance(account);
 	renderHistory(await getTransactions());
 }
@@ -115,7 +131,13 @@ main();
 async function createTransfer() {
 	let modal = document.querySelector("#modal-create-transfer");
 	modal.style.display = "flex";
-	let close = document.querySelector(".close-modal");
+	modal.onclick = (event) => {
+		let isModal = event.target.closest(".modal-auth");
+		let isCloseBtn = event.target.closest(".close-modal");
+		if (!isModal || isCloseBtn) {
+			modal.style.display = "none";
+		}
+	};
 	let transfer = document.querySelector(".transfer");
 	let safeTransferBtn = document.querySelector(".safe-transfer");
 	let categoriesSelect = document.querySelector("#category");
@@ -131,10 +153,6 @@ async function createTransfer() {
 	let patterns = await contractInstanse.methods
 		.showPatterns()
 		.call({ from: account });
-
-	close.addEventListener("click", () => {
-		modal.style.display = "none";
-	});
 
 	categoriesSelect.innerHTML = "<option value=''>Select category</option>";
 	for (let elem of categories) {
@@ -208,6 +226,21 @@ async function getTransactions() {
 }
 
 function renderHistory(array) {
+	let main = document.querySelector(".main-content");
+	main.innerHTML = `
+	<header class="history-header">
+                <div class="history-header-content">
+                    <p>Type: </p>
+                    <select name="type" class="history-type">
+                        <option value="all">All</option>
+                        <option value="in">Incoming</option>
+                        <option value="out">Outgoing</option>
+                    </select>
+                    <p class="done">Completed<input type="checkbox"></p>                    
+                </div>
+            </header>
+            <div class="content"></div>
+	`;
 	let div = document.querySelector(".content");
 	div.innerHTML = "";
 	let ul = document.createElement("ul");
@@ -330,25 +363,27 @@ function convertToDate(timestamp) {
 	}`;
 }
 
-function checkTransactionSender(elem, id, container){
+function checkTransactionSender(elem, id, container) {
 	let my = elem[0] == account ? true : false;
 	let status = elem[8];
 
-	if (my && status == 0 || status == 4){
+	if ((my && status == 0) || status == 4) {
 		let btn = document.createElement("button");
 		btn.classList.add("cancel-transaction");
 		btn.innerHTML = "Cancel";
 		btn.id = id;
-		// непрвильный айди 
+		// непрвильный айди
 		btn.onclick = async () => {
-			console.log(btn.id)
-			let res = await contractInstanse.methods.cancelTransaction(btn.id).call({from:account});
-			
-			console.log(res)
-		}
+			console.log(btn.id);
+			await contractInstanse.methods
+				.cancelTransaction(btn.id)
+				.send({ from: account });
+
+			getBalance(account);
+			renderHistory(await getTransactions());
+		};
 		container.append(btn);
-	}
-	else if (!my && status == 0){
+	} else if (!my && status == 0) {
 		let btn = document.createElement("button");
 		btn.classList.add("claim-transaction");
 		btn.innerHTML = "Claim";
@@ -356,6 +391,13 @@ function checkTransactionSender(elem, id, container){
 
 		btn.onclick = async () => {
 			let modal = document.querySelector("#modal-codeword");
+			modal.onclick = (event) => {
+				let isModal = event.target.closest(".modal-auth");
+				let isCloseBtn = event.target.closest(".close-modal");
+				if (!isModal || isCloseBtn) {
+					modal.style.display = "none";
+				}
+			};
 			let attempts = modal.querySelector(".attempts");
 			let inp = modal.querySelector(".codewordInp");
 			attempts.innerHTML = `Attempts left: ${elem[4]}`;
@@ -364,27 +406,54 @@ function checkTransactionSender(elem, id, container){
 			let enterCodeword = modal.querySelector(".enter-codeword");
 			enterCodeword.onclick = async (event) => {
 				event.preventDefault();
-				let codeword = await web3.utils.soliditySha3({type:"string", value:inp.value});
+				let codeword = await web3.utils.soliditySha3({
+					type: "string",
+					value: inp.value,
+				});
 				inp.value = "";
-				await contractInstanse.methods.receiveTransaction(btn.id, codeword).send({from: account, gas: "6721975"});
-				let resp = await contractInstanse.methods.transferResponseShow().call({from: account});
+				await contractInstanse.methods
+					.receiveTransaction(btn.id, codeword)
+					.send({ from: account, gas: "6721975" });
+				let resp = await contractInstanse.methods
+					.transferResponseShow()
+					.call({ from: account });
 				console.log(resp);
-				let check = await contractInstanse.methods.checkAttempts(btn.id).call({from: account});
-				if (resp == 1){
+				let check = await contractInstanse.methods
+					.checkAttempts(btn.id)
+					.call({ from: account });
+				if (resp == 1) {
 					alert("Transfer completed");
 					modal.style.display = "none";
 				}
-				if (resp == 2){
+				if (resp == 2) {
 					alert("Incorrect");
 					attempts.innerHTML = `Attempts left: ${check}`;
 				}
-				if (resp == 3){
+				if (resp == 3) {
 					alert("Attempts are over!");
 					modal.style.display = "none";
 				}
 				renderHistory(await getTransactions());
 			};
-		}
+		};
 		container.append(btn);
 	}
+}
+
+async function renderCategoriesPage() {
+	let main = document.querySelector(".main-content");
+	main.innerHTML = "";
+
+	let div = document.createElement("div");
+	div.classList.add("content");
+	main.append(div);
+
+	let categories = await contractInstanse.methods
+		.showCategories()
+		.call({ from: account });
+	let patterns = await contractInstanse.methods
+		.showPatterns()
+		.call({ from: account });
+
+	
 }
