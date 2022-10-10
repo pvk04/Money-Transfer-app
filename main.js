@@ -1,6 +1,6 @@
 import abi from "./abi.js";
 
-const contractAddress = "0x279657399Db39490B401e56d2b95cf80324132D5";
+const contractAddress = "0xB5D543ED822f999D6b8dFEeaD9Bbf2AD56731446";
 
 let web3, contractInstanse, account, accountRole;
 
@@ -211,43 +211,50 @@ function renderHistory(array) {
 	let ul = document.querySelector(".content-list");
 	ul.innerHTML = "";
 	let typeSelector = document.querySelector(".history-type");
-
+	let idElem = 0
 	for (let elem of array) {
 		if (elem[0] == account || elem[1] == account) {
-			renderHistoryElem(elem);
+			renderHistoryElem(elem, idElem);
 		}
+		idElem++;
 	}
 
 	typeSelector.addEventListener("change", (e) => {
 		let type = e.target.value;
-		ul.innerHTML = "";
+		let idElem = 0
 		switch (type) {
 			case "all":
+				ul.innerHTML = "";
 				for (let elem of array) {
 					if (elem[0] == account || elem[1] == account) {
-						renderHistoryElem(elem);
+						renderHistoryElem(elem, idElem);
 					}
+					idElem++;
 				}
 				break;
 			case "in":
+				ul.innerHTML = "";
 				for (let elem of array) {
 					if (elem[1] == account) {
-						renderHistoryElem(elem);
+						renderHistoryElem(elem, idElem);
 					}
+					idElem++;
 				}
 				break;
 			case "out":
+				ul.innerHTML = "";
 				for (let elem of array) {
 					if (elem[0] == account) {
-						renderHistoryElem(elem);
+						renderHistoryElem(elem, idElem);
 					}
+					idElem++;
 				}
 				break;
 		}
 	});
 }
 
-async function renderHistoryElem(elem) {
+async function renderHistoryElem(elem, idElem) {
 	let categories = await contractInstanse.methods
 		.showCategories()
 		.call({ from: account });
@@ -268,6 +275,7 @@ async function renderHistoryElem(elem) {
 	</div>
 	`;
 	ul.append(li);
+	checkTransactionSender(elem, idElem, li); // добавление кнопок claim || cancel
 }
 
 function statusRender(elem) {
@@ -309,7 +317,7 @@ function convertToDate(timestamp) {
 			? "0" + result.getMonth() + 1
 			: result.getMonth() + 1
 	}.${result.getFullYear()} ${
-		String(result.getHours() + 1).length < 2
+		String(result.getHours()).length < 2
 			? "0" + result.getHours()
 			: result.getHours()
 	}:${
@@ -317,4 +325,59 @@ function convertToDate(timestamp) {
 			? "0" + result.getMinutes()
 			: result.getMinutes()
 	}`;
+}
+
+function checkTransactionSender(elem, id, container){
+	let my = elem[0] == account ? true : false;
+	let status = elem[8];
+
+	if (my && status == 0 || status == 4){
+		let btn = document.createElement("button");
+		btn.classList.add("cancel-transaction");
+		btn.innerHTML = "Cancel";
+		btn.id = id;
+
+		btn.onclick = () => {
+			console.log(btn.id);
+		}
+		container.append(btn);
+	}
+	else if (!my && status == 0){
+		let btn = document.createElement("button");
+		btn.classList.add("claim-transaction");
+		btn.innerHTML = "Claim";
+		btn.id = id;
+
+		btn.onclick = async () => {
+			let modal = document.querySelector("#modal-codeword");
+			let attempts = modal.querySelector(".attempts");
+			let inp = modal.querySelector(".codewordInp");
+			attempts.innerHTML = `Attempts left: ${elem[4]}`;
+			modal.style.display = "flex";
+
+			let enterCodeword = modal.querySelector(".enter-codeword");
+			enterCodeword.onclick = async (event) => {
+				event.preventDefault();
+				let codeword = await web3.utils.soliditySha3({type:"string", value:inp.value});
+				inp.value = "";
+				await contractInstanse.methods.receiveTransaction(btn.id, codeword).send({from: account});
+				let resp = await contractInstanse.methods.transferResponseShow().call({from: account});
+				console.log(resp);
+				let check = await contractInstanse.methods.checkAttempts(btn.id).call({from: account});
+				if (resp == 1){
+					alert("Transfer completed");
+					modal.style.display = "none";
+				}
+				if (resp == 2){
+					alert("Incorrect");
+					attempts.innerHTML = `Attempts left: ${check}`;
+				}
+				if (resp == 3){
+					alert("Attempts are over!");
+					modal.style.display = "none";
+				}
+				renderHistory(await getTransactions());
+			};
+		}
+	}
 }

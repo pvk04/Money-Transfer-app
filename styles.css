@@ -71,7 +71,7 @@ html, body {
 .done{
     display: flex;
     margin-left: 30px;
-    align-items: center
+    align-items: center;
 }
 .done input{
     margin: 0;
@@ -115,6 +115,10 @@ html, body {
 }
 
 #modal-create-transfer{
+    display: none;
+}
+
+#modal-codeword{
     display: none;
 }
 
