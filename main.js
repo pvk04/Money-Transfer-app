@@ -1,6 +1,6 @@
 import abi from "./abi.js";
 
-const contractAddress = "0xB5D543ED822f999D6b8dFEeaD9Bbf2AD56731446";
+const contractAddress = "0x5915edd6F74C6613A359a876466bDbbd7CF6DdD4";
 
 let web3, contractInstanse, account, accountRole;
 
@@ -208,10 +208,13 @@ async function getTransactions() {
 }
 
 function renderHistory(array) {
-	let ul = document.querySelector(".content-list");
-	ul.innerHTML = "";
+	let div = document.querySelector(".content");
+	div.innerHTML = "";
+	let ul = document.createElement("ul");
+	ul.classList.add("content-list");
+	div.append(ul);
 	let typeSelector = document.querySelector(".history-type");
-	let idElem = 0
+	let idElem = 0;
 	for (let elem of array) {
 		if (elem[0] == account || elem[1] == account) {
 			renderHistoryElem(elem, idElem);
@@ -219,9 +222,9 @@ function renderHistory(array) {
 		idElem++;
 	}
 
-	typeSelector.addEventListener("change", (e) => {
+	typeSelector.onchange = (e) => {
 		let type = e.target.value;
-		let idElem = 0
+		let idElem = 0;
 		switch (type) {
 			case "all":
 				ul.innerHTML = "";
@@ -251,7 +254,7 @@ function renderHistory(array) {
 				}
 				break;
 		}
-	});
+	};
 }
 
 async function renderHistoryElem(elem, idElem) {
@@ -262,7 +265,7 @@ async function renderHistoryElem(elem, idElem) {
 	let li = document.createElement("li");
 	li.classList.add("content-elem");
 	li.innerHTML = `
-	<div class="content">
+	<div class="content-inner">
 		<p>From: ${elem[0]}</p>
 		<p>To: ${elem[1]}</p>
 		<p>${elem[2]}</p>
@@ -336,9 +339,12 @@ function checkTransactionSender(elem, id, container){
 		btn.classList.add("cancel-transaction");
 		btn.innerHTML = "Cancel";
 		btn.id = id;
-
-		btn.onclick = () => {
-			console.log(btn.id);
+		// непрвильный айди 
+		btn.onclick = async () => {
+			console.log(btn.id)
+			let res = await contractInstanse.methods.cancelTransaction(btn.id).call({from:account});
+			
+			console.log(res)
 		}
 		container.append(btn);
 	}
@@ -360,7 +366,7 @@ function checkTransactionSender(elem, id, container){
 				event.preventDefault();
 				let codeword = await web3.utils.soliditySha3({type:"string", value:inp.value});
 				inp.value = "";
-				await contractInstanse.methods.receiveTransaction(btn.id, codeword).send({from: account});
+				await contractInstanse.methods.receiveTransaction(btn.id, codeword).send({from: account, gas: "6721975"});
 				let resp = await contractInstanse.methods.transferResponseShow().call({from: account});
 				console.log(resp);
 				let check = await contractInstanse.methods.checkAttempts(btn.id).call({from: account});
@@ -379,5 +385,6 @@ function checkTransactionSender(elem, id, container){
 				renderHistory(await getTransactions());
 			};
 		}
+		container.append(btn);
 	}
 }
