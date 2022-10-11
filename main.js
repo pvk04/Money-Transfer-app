@@ -1,6 +1,6 @@
 import abi from "./abi.js";
 
-const contractAddress = "0xDD32B6351e714E5F52F3eba1a3558Da4F4342009";
+const contractAddress = "0x528C068cc8527f3Fe3938299FC28496fe09b407A";
 
 let web3, contractInstanse, account, accountRole;
 
@@ -381,7 +381,6 @@ function checkTransactionSender(elem, id, container) {
 		btn.classList.add("cancel-transaction");
 		btn.innerHTML = "Cancel";
 		btn.id = id;
-		// непрвильный айди
 		btn.onclick = async () => {
 			console.log(btn.id);
 			await contractInstanse.methods
@@ -453,6 +452,35 @@ async function renderCategoriesPage() {
 	let main = document.querySelector(".main-content");
 	main.innerHTML = "";
 
+	let addCategory = document.createElement("button");
+	addCategory.innerHTML = "Create new category";
+	addCategory.classList.add("create-category");
+	main.append(addCategory);
+	addCategory.onclick = () => {
+		let modal = document.querySelector("#modal-category");
+		modal.style.display = "flex";
+
+		modal.onclick = (event) => {
+			let isModal = event.target.closest(".modal-auth");
+			let isCloseBtn = event.target.closest(".close-modal");
+			if (!isModal || isCloseBtn) {
+				modal.style.display = "none";
+			}
+		}
+
+		let addBtn = modal.querySelector(".add-category");
+		addBtn.onclick = async (event) => {
+			event.preventDefault();
+			let nameInp = modal.querySelector(".name-category");
+			let name = nameInp.value;
+			let resp = await contractInstanse.methods.addCategory(name).send({from: account});
+			console.log(resp)
+			alert("Category successfully created");
+			nameInp.value = "";
+			renderCategoriesPage();
+		}
+	}
+
 	let div = document.createElement("div");
 	div.classList.add("content");
 	main.append(div);
@@ -481,7 +509,38 @@ async function renderCategoriesPage() {
 
 		let addPattern = document.createElement("button");
 		addPattern.innerHTML = "Add";
+		addPattern.classList.add("add-pattern");
 		liHeader.append(addPattern);
+		addPattern.onclick = () => {
+			let modal = document.querySelector("#modal-pattern");
+			modal.style.display = "flex";
+			let categoryName = document.querySelector(".category-name");
+			categoryName.innerHTML = category[1];
+
+			modal.onclick = (event) => {
+				let isModal = event.target.closest(".modal-auth");
+				let isCloseBtn = event.target.closest(".close-modal");
+				if (!isModal || isCloseBtn) {
+					modal.style.display = "none";
+				}
+			} 
+
+			let addBtn = modal.querySelector(".add-pattern");
+			addBtn.onclick = async (event) => {
+				event.preventDefault();
+				let nameInp = modal.querySelector(".name-pattern");
+				name = nameInp.value;
+				let valueInp = modal.querySelector(".value-pattern")
+				let value = valueInp.value;
+
+				await contractInstanse.methods.addPattern(category[0], name, value).send({from:account, gas: "6721975"});
+				alert("Pattern successfully created");
+				nameInp.value = "";
+				valueInp.value = "";
+
+				renderCategoriesPage();
+			}
+		}
 
 		let imgArrow = document.createElement("img");
 		imgArrow.classList.add("open-patterns");
@@ -493,9 +552,12 @@ async function renderCategoriesPage() {
 		categoryPatternsUl.classList.add("hide");
 		li.append(categoryPatternsUl);
 
-		liHeader.onclick = () => {
-			imgArrow.classList.toggle("rotate");
-			categoryPatternsUl.classList.toggle("hide");
+		liHeader.onclick = (event) => {
+			let isBtn = event.target.closest(".add-pattern");
+			if (!isBtn){
+				imgArrow.classList.toggle("rotate");
+				categoryPatternsUl.classList.toggle("hide");				
+			}
 		};
 
 		for (let pattern of patterns) {
