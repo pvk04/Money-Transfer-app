@@ -1,6 +1,6 @@
 import abi from "./abi.js";
 
-const contractAddress = "0x528C068cc8527f3Fe3938299FC28496fe09b407A";
+const contractAddress = "0xE8564ff8eFC9F7fb6CDD968688319bfC2622d0f3";
 
 let web3, contractInstanse, account, accountRole;
 
@@ -107,14 +107,18 @@ async function main() {
 		modalAuth.style.display = "flex";
 	});
 
-	let transactionHistory = document.querySelector(".transaction-hist");
+	let menu = document.querySelector(".nav-list");
+	menu.innerHTML = "";
+
+	let transactionHistory = document.createElement("li");
+	transactionHistory.classList.add("transaction-hist", "nav-elem");
+	transactionHistory.innerHTML = "Transaction history";
+	menu.append(transactionHistory);
 	transactionHistory.onclick = async () => {
 		renderHistory(await getTransactions());
 	};
 
 	if (accountRole == 1) {
-		let menu = document.querySelector(".nav-list");
-
 		let categories = document.createElement("li");
 		categories.classList.add("nav-elem");
 		categories.innerHTML = "Categories";
@@ -133,7 +137,6 @@ async function main() {
 	}
 
 	getBalance(account);
-	renderHistory(await getTransactions());
 }
 main();
 
@@ -453,7 +456,7 @@ async function renderCategoriesPage() {
 	main.innerHTML = "";
 
 	let addCategory = document.createElement("button");
-	addCategory.innerHTML = "Create new category";
+	addCategory.innerHTML = "New category";
 	addCategory.classList.add("create-category");
 	main.append(addCategory);
 	addCategory.onclick = () => {
@@ -466,20 +469,22 @@ async function renderCategoriesPage() {
 			if (!isModal || isCloseBtn) {
 				modal.style.display = "none";
 			}
-		}
+		};
 
 		let addBtn = modal.querySelector(".add-category");
 		addBtn.onclick = async (event) => {
 			event.preventDefault();
 			let nameInp = modal.querySelector(".name-category");
 			let name = nameInp.value;
-			let resp = await contractInstanse.methods.addCategory(name).send({from: account});
-			console.log(resp)
+			let resp = await contractInstanse.methods
+				.addCategory(name)
+				.send({ from: account, gas: "6721975" });
+			console.log(resp);
 			alert("Category successfully created");
 			nameInp.value = "";
 			renderCategoriesPage();
-		}
-	}
+		};
+	};
 
 	let div = document.createElement("div");
 	div.classList.add("content");
@@ -523,24 +528,26 @@ async function renderCategoriesPage() {
 				if (!isModal || isCloseBtn) {
 					modal.style.display = "none";
 				}
-			} 
+			};
 
 			let addBtn = modal.querySelector(".add-pattern");
 			addBtn.onclick = async (event) => {
 				event.preventDefault();
 				let nameInp = modal.querySelector(".name-pattern");
 				name = nameInp.value;
-				let valueInp = modal.querySelector(".value-pattern")
+				let valueInp = modal.querySelector(".value-pattern");
 				let value = valueInp.value;
 
-				await contractInstanse.methods.addPattern(category[0], name, value).send({from:account, gas: "6721975"});
+				await contractInstanse.methods
+					.addPattern(category[0], name, value)
+					.send({ from: account, gas: "6721975" });
 				alert("Pattern successfully created");
 				nameInp.value = "";
 				valueInp.value = "";
 
 				renderCategoriesPage();
-			}
-		}
+			};
+		};
 
 		let imgArrow = document.createElement("img");
 		imgArrow.classList.add("open-patterns");
@@ -554,9 +561,9 @@ async function renderCategoriesPage() {
 
 		liHeader.onclick = (event) => {
 			let isBtn = event.target.closest(".add-pattern");
-			if (!isBtn){
+			if (!isBtn) {
 				imgArrow.classList.toggle("rotate");
-				categoryPatternsUl.classList.toggle("hide");				
+				categoryPatternsUl.classList.toggle("hide");
 			}
 		};
 
@@ -575,7 +582,37 @@ async function renderVotingsPage() {
 	let main = document.querySelector(".main-content");
 	main.innerHTML = "";
 
+	let addVoting = document.createElement("button");
+	addVoting.innerHTML = "New voting";
+	addVoting.classList.add("create-voting");
+	main.append(addVoting);
+
 	let div = document.createElement("div");
 	div.classList.add("content");
 	main.append(div);
+
+	let ul = document.createElement("ul");
+	ul.classList.add("content-list");
+	div.append(ul);
+
+	let votings = await contractInstanse.methods
+		.showVotings()
+		.call({ from: account });
+
+	for (let elem of votings) {
+		let li = document.createElement("li");
+		li.classList.add("content-elem");
+		ul.append(li);
+
+		let liHeader = document.createElement("header");
+		liHeader.classList.add("li-header");
+		liHeader.innerHTML = `<p>Give ${elem[0]} admin role</p>`;
+
+		li.append(liHeader);
+
+		let addPattern = document.createElement("button");
+		addPattern.innerHTML = "Vote";
+		addPattern.classList.add("add-pattern");
+		liHeader.append(addPattern);
+	}
 }
