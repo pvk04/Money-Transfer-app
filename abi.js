@@ -2,6 +2,42 @@ const abi = [
 	{
 		inputs: [
 			{
+				internalType: "string",
+				name: "name",
+				type: "string",
+			},
+		],
+		name: "addCategory",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function",
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "category",
+				type: "uint256",
+			},
+			{
+				internalType: "string",
+				name: "name",
+				type: "string",
+			},
+			{
+				internalType: "uint256",
+				name: "money",
+				type: "uint256",
+			},
+		],
+		name: "addPattern",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function",
+	},
+	{
+		inputs: [
+			{
 				internalType: "uint256",
 				name: "id_transaction",
 				type: "uint256",
@@ -212,7 +248,7 @@ const abi = [
 						type: "uint256",
 					},
 				],
-				internalType: "struct Storage.TransferPattern[]",
+				internalType: "struct Storage.Pattern[]",
 				name: "",
 				type: "tuple[]",
 			},

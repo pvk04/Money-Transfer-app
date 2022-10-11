@@ -1,6 +1,6 @@
 import abi from "./abi.js";
 
-const contractAddress = "0x4982786d536A9A910F635BB308a48086c9F2f54f";
+const contractAddress = "0xDD32B6351e714E5F52F3eba1a3558Da4F4342009";
 
 let web3, contractInstanse, account, accountRole;
 
@@ -114,12 +114,21 @@ async function main() {
 
 	if (accountRole == 1) {
 		let menu = document.querySelector(".nav-list");
+
 		let categories = document.createElement("li");
 		categories.classList.add("nav-elem");
 		categories.innerHTML = "Categories";
 		menu.append(categories);
 		categories.onclick = async () => {
 			await renderCategoriesPage();
+		};
+
+		let votings = document.createElement("li");
+		votings.classList.add("nav-elem");
+		votings.innerHTML = "Votings";
+		menu.append(votings);
+		votings.onclick = async () => {
+			await renderVotingsPage();
 		};
 	}
 
@@ -448,6 +457,10 @@ async function renderCategoriesPage() {
 	div.classList.add("content");
 	main.append(div);
 
+	let ul = document.createElement("ul");
+	ul.classList.add("content-list");
+	div.append(ul);
+
 	let categories = await contractInstanse.methods
 		.showCategories()
 		.call({ from: account });
@@ -455,5 +468,52 @@ async function renderCategoriesPage() {
 		.showPatterns()
 		.call({ from: account });
 
-	
+	for (let category of categories) {
+		let li = document.createElement("li");
+		li.classList.add("content-elem");
+		ul.append(li);
+
+		let liHeader = document.createElement("header");
+		liHeader.classList.add("li-header");
+		liHeader.innerHTML = `<p>${category[1]}</p>`;
+
+		li.append(liHeader);
+
+		let addPattern = document.createElement("button");
+		addPattern.innerHTML = "Add";
+		liHeader.append(addPattern);
+
+		let imgArrow = document.createElement("img");
+		imgArrow.classList.add("open-patterns");
+		imgArrow.src = "./assets/arrow.svg";
+		liHeader.prepend(imgArrow);
+
+		let categoryPatternsUl = document.createElement("ul");
+		categoryPatternsUl.classList.add("patterns-list");
+		categoryPatternsUl.classList.add("hide");
+		li.append(categoryPatternsUl);
+
+		liHeader.onclick = () => {
+			imgArrow.classList.toggle("rotate");
+			categoryPatternsUl.classList.toggle("hide");
+		};
+
+		for (let pattern of patterns) {
+			if (pattern[0] == category[0]) {
+				let liPattern = document.createElement("li");
+				liPattern.classList.add("pattern-elem");
+				liPattern.innerHTML = pattern[1] + ": " + pattern[2] + " coins";
+				categoryPatternsUl.append(liPattern);
+			}
+		}
+	}
+}
+
+async function renderVotingsPage() {
+	let main = document.querySelector(".main-content");
+	main.innerHTML = "";
+
+	let div = document.createElement("div");
+	div.classList.add("content");
+	main.append(div);
 }

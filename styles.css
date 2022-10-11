@@ -97,6 +97,40 @@ html, body {
     margin-bottom: 10px;
 }
 
+.li-header{
+    display: flex;
+    height: 100%;
+    align-items: center;
+}
+
+.open-patterns{
+    width: 10px;
+    height: 10px;
+    margin-right: 10px;
+    transition: .2s;
+}
+
+.rotate{
+    transform: rotate(90deg);
+}
+
+.patterns-list{
+    list-style: none;
+    margin: 5px 50px;
+    padding: 0;
+}
+
+.pattern-elem{
+    display: flex;
+    margin: 20px 0;
+    padding: 5px;
+    height: 40px;
+    border: 1px solid;
+    align-items: center;
+}
+
+
+
 
 
 
@@ -257,4 +291,8 @@ input:checked+.slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+.hide{
+    display: none;
 }
