@@ -1,6 +1,6 @@
 import abi from "./abi.js";
 
-const contractAddress = "0xE8564ff8eFC9F7fb6CDD968688319bfC2622d0f3";
+const contractAddress = "0xeb4d9CD90b28e171b6DEBFC4e70A4d9C0A46Ff0F";
 
 let web3, contractInstanse, account, accountRole;
 
@@ -102,7 +102,6 @@ async function main() {
 
 	let exitBtn = document.querySelector(".exit");
 	exitBtn.addEventListener("click", () => {
-		console.log(21);
 		localStorage.removeItem("accountinfo");
 		modalAuth.style.display = "flex";
 	});
@@ -117,6 +116,7 @@ async function main() {
 	transactionHistory.onclick = async () => {
 		renderHistory(await getTransactions());
 	};
+	renderHistory(await getTransactions());
 
 	if (accountRole == 1) {
 		let categories = document.createElement("li");
@@ -587,6 +587,36 @@ async function renderVotingsPage() {
 	addVoting.classList.add("create-voting");
 	main.append(addVoting);
 
+	let adminCount = document.createElement('p');
+	adminCount.innerHTML = "Admin count: 1";
+	main.append(adminCount);
+
+	addVoting.onclick = async () => {
+		let modal = document.querySelector("#modal-create-voting");
+		modal.style.display = "flex";
+
+		modal.onclick = () => {
+			let isModal = event.target.closest(".modal-auth");
+			let isCloseBtn = event.target.closest(".close-modal");
+			if (!isModal || isCloseBtn) {
+				modal.style.display = "none";
+			}	
+		}
+		
+		let addBtn = modal.querySelector(".nominate");
+		addBtn.onclick = async (event) => {
+			event.preventDefault();
+			let userInp = modal.querySelector(".user");
+			let user = userInp.value;
+			await contractInstanse.methods.nominate(user, 1).send({from: account, gas: "6721975"});
+			alert("Voting created");
+
+			userInp.value = "";
+			renderVotingsPage();
+			modal.style.display = "none";
+		}
+	}
+
 	let div = document.createElement("div");
 	div.classList.add("content");
 	main.append(div);
@@ -597,8 +627,12 @@ async function renderVotingsPage() {
 
 	let votings = await contractInstanse.methods
 		.showVotings()
-		.call({ from: account });
+		.call({ from: account }, function (error, res) {
+			console.log(error)
+			console.log(res)
+		});
 
+	let idVoting = 0;
 	for (let elem of votings) {
 		let li = document.createElement("li");
 		li.classList.add("content-elem");
@@ -607,12 +641,58 @@ async function renderVotingsPage() {
 		let liHeader = document.createElement("header");
 		liHeader.classList.add("li-header");
 		liHeader.innerHTML = `<p>Give ${elem[0]} admin role</p>`;
-
 		li.append(liHeader);
 
-		let addPattern = document.createElement("button");
-		addPattern.innerHTML = "Vote";
-		addPattern.classList.add("add-pattern");
-		liHeader.append(addPattern);
+		let divBtns = document.createElement("div");
+		divBtns.id = idVoting;
+		divBtns.classList.add("vote-btns");
+		if (elem[3] == true){
+			liHeader.append(divBtns);
+		}
+
+		let voteFalse = document.createElement("img");
+		voteFalse.src = "./assets/cross.svg";
+		voteFalse.classList.add("cancel-vote");
+		divBtns.append(voteFalse);
+
+		voteFalse.onclick = () => {
+			vote(divBtns.id, false, elem[2]);
+		}
+
+		let voteTrue = document.createElement("img");
+		voteTrue.src = "./assets/check-mark.svg";
+		voteTrue.classList.add("accept-vote");
+		divBtns.append(voteTrue);
+
+		voteTrue.onclick = () => {
+			vote(divBtns.id, true, elem[2]);
+		}
+
+		idVoting++;
+
+		let votingInfo = document.createElement('ul');
+		li.append(votingInfo);
+
+		let status = document.createElement('p');
+		status.innerHTML = `Status:  ${elem[3] == true ? "Voting in progress" : "Voting is over"}` ;
+		votingInfo.append(status);
+
+
+	}
+}
+
+async function vote(id, value, votes){
+	let error = false;
+	for (let vote of votes){
+		if (vote[0] == account){
+			alert("You already voted!");
+			return error = true;
+		}
+	}
+
+	if (error == false){
+		console.log(id)
+		let resp = await contractInstanse.methods.vote(id, value).send({from: account, gas: "6721975"});
+		console.log(resp)
 	}
 }

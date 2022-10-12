@@ -149,6 +149,30 @@ button{
     margin-left: 50px;
 }
 
+.create-voting{
+    margin-top: 10px;
+    margin-left: 50px;
+}
+
+.cancel-vote{
+    margin: 0 5px;
+    width: 15px;
+    height: 15px;
+    background: red;
+    padding: 3px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.accept-vote{
+    margin: 0 5px;
+    width: 15px;
+    height: 15px;
+    background: green;
+    padding: 3px;
+    border-radius: 50%;
+    cursor: pointer;
+}
 
 
 
@@ -180,6 +204,10 @@ button{
 }
 
 #modal-codeword{
+    display: none;
+}
+
+#modal-create-voting{
     display: none;
 }
 
