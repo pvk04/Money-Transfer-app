@@ -2,6 +2,8 @@ import { web3, contractInstanse } from "./network.js";
 import { account } from "./main.js";
 import { getBalance } from "./getBalance.js";
 import { renderHistory } from "./renderHistory.js";
+import { errorCatch } from "./errorCatch.js";
+import { validation } from "./validation.js";
 
 export async function createTransfer() {
 	let modal = document.querySelector("#modal-create-transfer");
@@ -17,9 +19,6 @@ export async function createTransfer() {
 	let safeTransferBtn = document.querySelector(".safe-transfer");
 	let categoriesSelect = document.querySelector("#category");
 	let patternsSelect = document.querySelector("#pattern");
-	let recieverInp = document.querySelector(".reciever");
-	let amountMoneyInp = document.querySelector(".money");
-	let codewordInp = document.querySelector(".codeword");
 	let safeTransfer = false;
 	let currentCategory, currentPattern;
 	let categories = await contractInstanse.methods
@@ -67,28 +66,55 @@ export async function createTransfer() {
 
 	transfer.onclick = async (event) => {
 		event.preventDefault();
-		let to = recieverInp.value;
-		let money = web3.utils.toWei(amountMoneyInp.value, "wei");
-		let codeword = await web3.utils.soliditySha3({
-			type: "string",
-			value: codewordInp.value,
-		});
-		try {
-			await contractInstanse.methods
-				.createTransaction(
-					to,
-					money,
-					codeword,
-					currentCategory,
-					safeTransfer
-				)
-				.send({ value: money, from: account, gas: "6721975" });
-			alert("Transaction succesfully created");
-			getBalance(account);
-			renderHistory();
-		} catch (err) {
-			console.log(err.message);
-			getBalance(account);
+
+		let recieverInp = document.querySelector(".reciever");
+		let recieverInpValid = validation(recieverInp, "address");
+		let amountMoneyInp = document.querySelector(".money");
+		let amountMoneyInpValid = validation(amountMoneyInp);
+		let codewordInp = document.querySelector(".codeword");
+		let codewordInpValid = validation(codewordInp);
+		let categoriesSelectValid = validation(categoriesSelect);
+
+		if (
+			recieverInpValid &&
+			amountMoneyInpValid &&
+			codewordInpValid &&
+			categoriesSelectValid
+		) {
+			try {
+				let to = recieverInp.value.trim();
+				let money = web3.utils.toWei(
+					amountMoneyInp.value.trim(),
+					"wei"
+				);
+				let codeword = await web3.utils.soliditySha3({
+					type: "string",
+					value: codewordInp.value.trim(),
+				});
+
+				await contractInstanse.methods
+					.createTransaction(
+						to,
+						money,
+						codeword,
+						currentCategory,
+						safeTransfer
+					)
+					.send({ value: money, from: account, gas: "6721975" });
+				alert("Transaction succesfully created");
+
+				recieverInp.value = "";
+				amountMoneyInp.value = "";
+				codewordInp = "";
+				categoriesSelect.value = "";
+				patternsSelect.value = "";
+
+				getBalance(account);
+				renderHistory();
+			} catch (error) {
+				errorCatch(error);
+				getBalance(account);
+			}
 		}
 	};
 }

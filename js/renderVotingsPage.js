@@ -1,5 +1,7 @@
+import { errorCatch } from "./errorCatch.js";
 import { account } from "./main.js";
 import { contractInstanse } from "./network.js";
+import { validation } from "./validation.js";
 
 export async function renderVotingsPage() {
 	let main = document.querySelector(".main-content");
@@ -26,15 +28,23 @@ export async function renderVotingsPage() {
 		addBtn.onclick = async (event) => {
 			event.preventDefault();
 			let userInp = modal.querySelector(".user");
-			let user = userInp.value;
-			await contractInstanse.methods
-				.nominate(user, 1)
-				.send({ from: account, gas: "6721975" });
-			alert("Voting created");
+			let userInpValid = validation(userInp, "address");
+
+			if (userInpValid) {
+				try {
+					let user = userInp.value;
+					await contractInstanse.methods
+						.nominate(user, 1)
+						.send({ from: account, gas: "6721975" });
+					alert("Voting created");
+					renderVotingsPage();
+					modal.style.display = "none";
+				} catch (error) {
+					errorCatch(error);
+				}
+			}
 
 			userInp.value = "";
-			renderVotingsPage();
-			modal.style.display = "none";
 		};
 	};
 
@@ -48,10 +58,7 @@ export async function renderVotingsPage() {
 
 	let votings = await contractInstanse.methods
 		.showVotings()
-		.call({ from: account }, function (error, res) {
-			console.log(error);
-			console.log(res);
-		});
+		.call({ from: account });
 
 	let idVoting = 0;
 	for (let elem of votings) {
@@ -69,9 +76,8 @@ export async function renderVotingsPage() {
 		divBtns.classList.add("vote-btns");
 		if (elem[3] == 0 && checkVoted(elem[2])) {
 			liHeader.append(divBtns);
-		}
-		else{
-			liHeader.append("Voted")
+		} else {
+			liHeader.append("Voted");
 		}
 
 		let voteFalse = document.createElement("img");
@@ -103,32 +109,38 @@ export async function renderVotingsPage() {
 
 		let status = document.createElement("p");
 		status.innerHTML = `Status:  ${
-			elem[3] == 0 ? "Voting in progress" : elem[3] == 1 ? "Voting is over" : "User promoted"
+			elem[3] == 0
+				? "Voting in progress"
+				: elem[3] == 1
+				? "Voting is over"
+				: "User promoted"
 		}`;
 		votingInfo.append(status);
 
-		let votesLeft = document.createElement('p');
-		let adminsAmount = await contractInstanse.methods.showAdminsAmount().call({from: account});
+		let votesLeft = document.createElement("p");
+		let adminsAmount = await contractInstanse.methods
+			.showAdminsAmount()
+			.call({ from: account });
 		votesLeft.innerHTML = `Votes left: ${adminsAmount - elem[2].length}`;
-		if (elem[3] != 2){
+		if (elem[3] != 2) {
 			votingInfo.append(votesLeft);
 		}
 	}
 }
 
-function checkVoted(votes){
+function checkVoted(votes) {
 	for (let vote of votes) {
 		if (vote[0] == account) {
 			return false;
 		}
-	}	
+	}
 	return true;
 }
 
 async function vote(id, value, votes) {
-	if (checkVoted(votes)){
+	if (checkVoted(votes)) {
 		await contractInstanse.methods
 			.vote(id, value)
 			.send({ from: account, gas: "6721975" });
-	}		
+	}
 }

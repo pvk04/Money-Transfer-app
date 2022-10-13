@@ -1,6 +1,7 @@
 import { contractInstanse } from "./network.js";
 import { account } from "./main.js";
-import { errorCatch } from "../errorCatch.js";
+import { errorCatch } from "./errorCatch.js";
+import { validation } from "./validation.js";
 
 export async function renderCategoriesPage() {
 	let main = document.querySelector(".main-content");
@@ -26,17 +27,20 @@ export async function renderCategoriesPage() {
 		addBtn.onclick = async (event) => {
 			event.preventDefault();
 			let nameInp = modal.querySelector(".name-category");
-			let name = nameInp.value;
-			try{
-				let resp = await contractInstanse.methods
-				.addCategory(name)
-				.send({ from: account, gas: "6721975" });
-				alert("Category successfully created");
-				nameInp.value = "";
-				renderCategoriesPage();
-			}
-			catch(error){
-				errorCatch(error);
+			let nameInpValid = validation(nameInp);
+
+			if (nameInpValid) {
+				try {
+					let name = nameInp.value;
+					let resp = await contractInstanse.methods
+						.addCategory(name)
+						.send({ from: account, gas: "6721975" });
+					alert("Category successfully created");
+					nameInp.value = "";
+					renderCategoriesPage();
+				} catch (error) {
+					errorCatch(error);
+				}
 			}
 		};
 	};
@@ -89,18 +93,25 @@ export async function renderCategoriesPage() {
 			addBtn.onclick = async (event) => {
 				event.preventDefault();
 				let nameInp = modal.querySelector(".name-pattern");
-				name = nameInp.value;
+				let nameInpValid = validation(nameInp);
 				let valueInp = modal.querySelector(".value-pattern");
-				let value = valueInp.value;
+				let valueInpValid = validation(valueInp);
 
-				await contractInstanse.methods
-					.addPattern(category[0], name, value)
-					.send({ from: account, gas: "6721975" });
-				alert("Pattern successfully created");
-				nameInp.value = "";
-				valueInp.value = "";
-
-				renderCategoriesPage();
+				if (nameInpValid && valueInpValid) {
+					try {
+						let name = nameInp.value.trim();
+						let value = valueInp.value.trim();
+						await contractInstanse.methods
+							.addPattern(category[0], name, value)
+							.send({ from: account, gas: "6721975" });
+						alert("Pattern successfully created");
+						nameInp.value = "";
+						valueInp.value = "";
+						renderCategoriesPage();
+					} catch (error) {
+						errorCatch(error);
+					}
+				}
 			};
 		};
 

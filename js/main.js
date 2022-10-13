@@ -4,9 +4,11 @@ import { createTransfer } from "./createTransfer.js";
 import { renderHistory } from "./renderHistory.js";
 import { renderCategoriesPage } from "./renderCategoriesPage.js";
 import { renderVotingsPage } from "./renderVotingsPage.js";
-import { errorCatch } from "../errorCatch.js";
+import { errorCatch } from "./errorCatch.js";
+import { validation } from "./validation.js";
 
 export let account, accountRole;
+
 main();
 async function main() {
 	network();
@@ -17,75 +19,6 @@ async function main() {
 		accountRole = accInfo.accountRole;
 	} else {
 		modalAuth.style.display = "flex";
-		// REGISTRATION
-		let btnReg = document.querySelector(".regBtn");
-		btnReg.onclick =  async (event) => {
-			event.preventDefault();
-
-			let addressAuthInp = document.querySelector(".authAddress");
-			let addressValue = addressAuthInp.value;
-			let passwordAuthInp = document.querySelector(".authPassword");
-			let passwordValue = web3.utils.soliditySha3({
-				type: "string",
-				value: passwordAuthInp.value,
-			});
-
-			try{
-				await contractInstanse.methods
-				.registration(addressValue, passwordValue)
-				.send({ from: addressValue }, function (error, result) {
-					console.log("registration error: ", error);
-					console.log("result: ", result);
-					if (error === null) {
-						alert("You have successfully registered!");
-					}
-				});
-				main();
-			}
-			catch(error){
-				errorCatch(error);
-			}
-			
-		};
-
-		//LOGIN
-		let btnLogin = document.querySelector(".login");
-		btnLogin.onclick =  async (event) => {
-			event.preventDefault();
-			let addressAuthInp = document.querySelector(".authAddress");
-			let addressValue = addressAuthInp.value;
-			let passwordAuthInp = document.querySelector(".authPassword");
-			let passwordValue = web3.utils.soliditySha3({
-				type: "string",
-				value: passwordAuthInp.value,
-			});
-
-			try {
-				let resp = await contractInstanse.methods
-					.auth(addressValue, passwordValue)
-					.call({ from: addressValue }, function (error, result) {
-						console.log("registration error: ", error);
-						console.log("result: ", result);
-					});
-				console.log(resp)
-				if (resp == true) {
-					let modalAuth = document.querySelector("#modal-auth");
-					account = addressValue;
-					accountRole = await contractInstanse.methods
-						.showRole(account)
-						.call({ from: account });
-					modalAuth.style.display = "none";
-					localStorage.setItem(
-						"accountinfo",
-						JSON.stringify({ account, accountRole })
-					);
-					passwordAuthInp.value = "";
-					main();
-				}
-			} catch (error) {
-				errorCatch(error);
-			}
-		};
 	}
 
 	let accountAddressLab = document.querySelector(".account-address");
@@ -135,3 +68,76 @@ async function main() {
 
 	getBalance(account);
 }
+
+// REGISTRATION
+let btnReg = document.querySelector(".regBtn");
+btnReg.onclick = async (event) => {
+	event.preventDefault();
+
+	let addressAuthInp = document.querySelector(".authAddress");
+	let addressAuthInpValid = validation(addressAuthInp, "address");
+	let passwordAuthInp = document.querySelector(".authPassword");
+	let passwordAuthInpValid = validation(passwordAuthInp);
+
+	if (addressAuthInpValid && passwordAuthInpValid) {
+		try {
+			let addressValue = addressAuthInp.value.trim();
+			let passwordValue = web3.utils.soliditySha3({
+				type: "string",
+				value: passwordAuthInp.value.trim(),
+			});
+
+			await contractInstanse.methods
+				.registration(addressValue, passwordValue)
+				.send({ from: addressValue }, function (error) {
+					if (error === null) {
+						alert("You have successfully registered!");
+					}
+				});
+			main();
+		} catch (error) {
+			errorCatch(error);
+		}
+	}
+};
+
+//LOGIN
+let btnLogin = document.querySelector(".login");
+btnLogin.onclick = async (event) => {
+	event.preventDefault();
+
+	let addressAuthInp = document.querySelector(".authAddress");
+	let addressAuthInpValid = validation(addressAuthInp, "address");
+	let passwordAuthInp = document.querySelector(".authPassword");
+	let passwordAuthInpValid = validation(passwordAuthInp);
+
+	if (addressAuthInpValid && passwordAuthInpValid) {
+		try {
+			let addressValue = addressAuthInp.value.trim();
+			let passwordValue = web3.utils.soliditySha3({
+				type: "string",
+				value: passwordAuthInp.value.trim(),
+			});
+
+			let resp = await contractInstanse.methods
+				.auth(addressValue, passwordValue)
+				.call({ from: addressValue });
+			if (resp == true) {
+				let modalAuth = document.querySelector("#modal-auth");
+				account = addressValue;
+				accountRole = await contractInstanse.methods
+					.showRole(account)
+					.call({ from: account });
+				modalAuth.style.display = "none";
+				localStorage.setItem(
+					"accountinfo",
+					JSON.stringify({ account, accountRole })
+				);
+				passwordAuthInp.value = "";
+				main();
+			}
+		} catch (error) {
+			errorCatch(error);
+		}
+	}
+};

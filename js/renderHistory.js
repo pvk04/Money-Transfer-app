@@ -1,6 +1,7 @@
 import { web3, contractInstanse } from "./network.js";
 import { account } from "./main.js";
 import { getBalance } from "./getBalance.js";
+import { errorCatch } from "./errorCatch.js";
 
 export async function renderHistory() {
 	let array = await contractInstanse.methods
@@ -154,10 +155,13 @@ function checkTransactionSender(elem, id, container) {
 		btn.innerHTML = "Cancel";
 		btn.id = id;
 		btn.onclick = async () => {
-			console.log(btn.id);
-			await contractInstanse.methods
-				.cancelTransaction(btn.id)
-				.send({ from: account });
+			try {
+				await contractInstanse.methods
+					.cancelTransaction(btn.id)
+					.send({ from: account });
+			} catch (error) {
+				errorCatch(error);
+			}
 
 			getBalance(account);
 			renderHistory();
@@ -191,16 +195,23 @@ function checkTransactionSender(elem, id, container) {
 					value: inp.value,
 				});
 				inp.value = "";
-				await contractInstanse.methods
-					.receiveTransaction(btn.id, codeword)
-					.send({ from: account, gas: "6721975" });
+
+				try {
+					await contractInstanse.methods
+						.receiveTransaction(btn.id, codeword)
+						.send({ from: account, gas: "6721975" });
+				} catch (error) {
+					errorCatch(error);
+				}
+
 				let resp = await contractInstanse.methods
 					.transferResponseShow()
 					.call({ from: account });
-				console.log(resp);
+
 				let check = await contractInstanse.methods
 					.checkAttempts(btn.id)
 					.call({ from: account });
+
 				if (resp == 1) {
 					alert("Transfer completed");
 					modal.style.display = "none";
