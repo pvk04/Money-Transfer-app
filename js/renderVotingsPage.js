@@ -10,10 +10,6 @@ export async function renderVotingsPage() {
 	addVoting.classList.add("create-voting");
 	main.append(addVoting);
 
-	let adminCount = document.createElement("p");
-	adminCount.innerHTML = "Admin count: 1";
-	main.append(adminCount);
-
 	addVoting.onclick = async () => {
 		let modal = document.querySelector("#modal-create-voting");
 		modal.style.display = "flex";
@@ -71,8 +67,11 @@ export async function renderVotingsPage() {
 		let divBtns = document.createElement("div");
 		divBtns.id = idVoting;
 		divBtns.classList.add("vote-btns");
-		if (elem[3] == true) {
+		if (elem[3] == 0 && checkVoted(elem[2])) {
 			liHeader.append(divBtns);
+		}
+		else{
+			liHeader.append("Voted")
 		}
 
 		let voteFalse = document.createElement("img");
@@ -80,9 +79,10 @@ export async function renderVotingsPage() {
 		voteFalse.classList.add("cancel-vote");
 		divBtns.append(voteFalse);
 
-		voteFalse.onclick = () => {
-			vote(divBtns.id, false, elem[2]);
+		voteFalse.onclick = async () => {
+			await vote(divBtns.id, false, elem[2]);
 			renderVotingsPage();
+			divBtns.innerHTML = "Voted";
 		};
 
 		let voteTrue = document.createElement("img");
@@ -90,9 +90,10 @@ export async function renderVotingsPage() {
 		voteTrue.classList.add("accept-vote");
 		divBtns.append(voteTrue);
 
-		voteTrue.onclick = () => {
-			vote(divBtns.id, true, elem[2]);
+		voteTrue.onclick = async () => {
+			await vote(divBtns.id, true, elem[2]);
 			renderVotingsPage();
+			divBtns.innerHTML = "Voted";
 		};
 
 		idVoting++;
@@ -102,26 +103,32 @@ export async function renderVotingsPage() {
 
 		let status = document.createElement("p");
 		status.innerHTML = `Status:  ${
-			elem[3] == true ? "Voting in progress" : "Voting is over"
+			elem[3] == 0 ? "Voting in progress" : elem[3] == 1 ? "Voting is over" : "User promoted"
 		}`;
 		votingInfo.append(status);
+
+		let votesLeft = document.createElement('p');
+		let adminsAmount = await contractInstanse.methods.showAdminsAmount().call({from: account});
+		votesLeft.innerHTML = `Votes left: ${adminsAmount - elem[2].length}`;
+		if (elem[3] != 2){
+			votingInfo.append(votesLeft);
+		}
 	}
 }
 
-async function vote(id, value, votes) {
-	let error = false;
+function checkVoted(votes){
 	for (let vote of votes) {
 		if (vote[0] == account) {
-			alert("You already voted!");
-			return (error = true);
+			return false;
 		}
-	}
+	}	
+	return true;
+}
 
-	if (error == false) {
-		console.log(id);
-		let resp = await contractInstanse.methods
+async function vote(id, value, votes) {
+	if (checkVoted(votes)){
+		await contractInstanse.methods
 			.vote(id, value)
 			.send({ from: account, gas: "6721975" });
-		console.log(resp);
-	}
+	}		
 }

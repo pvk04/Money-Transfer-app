@@ -4,9 +4,10 @@ import { createTransfer } from "./createTransfer.js";
 import { renderHistory } from "./renderHistory.js";
 import { renderCategoriesPage } from "./renderCategoriesPage.js";
 import { renderVotingsPage } from "./renderVotingsPage.js";
+import { errorCatch } from "../errorCatch.js";
 
 export let account, accountRole;
-
+main();
 async function main() {
 	network();
 	let modalAuth = document.querySelector("#modal-auth");
@@ -18,8 +19,8 @@ async function main() {
 		modalAuth.style.display = "flex";
 		// REGISTRATION
 		let btnReg = document.querySelector(".regBtn");
-		btnReg.addEventListener("click", async (e) => {
-			e.preventDefault();
+		btnReg.onclick =  async (event) => {
+			event.preventDefault();
 
 			let addressAuthInp = document.querySelector(".authAddress");
 			let addressValue = addressAuthInp.value;
@@ -29,7 +30,8 @@ async function main() {
 				value: passwordAuthInp.value,
 			});
 
-			await contractInstanse.methods
+			try{
+				await contractInstanse.methods
 				.registration(addressValue, passwordValue)
 				.send({ from: addressValue }, function (error, result) {
 					console.log("registration error: ", error);
@@ -38,11 +40,17 @@ async function main() {
 						alert("You have successfully registered!");
 					}
 				});
-		});
+				main();
+			}
+			catch(error){
+				errorCatch(error);
+			}
+			
+		};
 
 		//LOGIN
 		let btnLogin = document.querySelector(".login");
-		btnLogin.addEventListener("click", async (event) => {
+		btnLogin.onclick =  async (event) => {
 			event.preventDefault();
 			let addressAuthInp = document.querySelector(".authAddress");
 			let addressValue = addressAuthInp.value;
@@ -59,13 +67,13 @@ async function main() {
 						console.log("registration error: ", error);
 						console.log("result: ", result);
 					});
+				console.log(resp)
 				if (resp == true) {
 					let modalAuth = document.querySelector("#modal-auth");
 					account = addressValue;
 					accountRole = await contractInstanse.methods
 						.showRole(account)
 						.call({ from: account });
-					console.log(accountRole);
 					modalAuth.style.display = "none";
 					localStorage.setItem(
 						"accountinfo",
@@ -75,9 +83,9 @@ async function main() {
 					main();
 				}
 			} catch (error) {
-				alert(error.name);
+				errorCatch(error);
 			}
-		});
+		};
 	}
 
 	let accountAddressLab = document.querySelector(".account-address");
@@ -127,4 +135,3 @@ async function main() {
 
 	getBalance(account);
 }
-main();

@@ -1,5 +1,6 @@
 import { contractInstanse } from "./network.js";
 import { account } from "./main.js";
+import { errorCatch } from "../errorCatch.js";
 
 export async function renderCategoriesPage() {
 	let main = document.querySelector(".main-content");
@@ -26,13 +27,17 @@ export async function renderCategoriesPage() {
 			event.preventDefault();
 			let nameInp = modal.querySelector(".name-category");
 			let name = nameInp.value;
-			let resp = await contractInstanse.methods
+			try{
+				let resp = await contractInstanse.methods
 				.addCategory(name)
 				.send({ from: account, gas: "6721975" });
-			console.log(resp);
-			alert("Category successfully created");
-			nameInp.value = "";
-			renderCategoriesPage();
+				alert("Category successfully created");
+				nameInp.value = "";
+				renderCategoriesPage();
+			}
+			catch(error){
+				errorCatch(error);
+			}
 		};
 	};
 
