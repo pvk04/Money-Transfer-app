@@ -7,8 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Money transfer</title>
     <link rel="stylesheet" href="./styles.css">
-    <script src="web3_min.js" ></script>
-    <script type="module" src="main.js"></script>
+    <script src="./js/web3_min.js" defer></script>
+    <script type="module" src="./js/main.js" defer></script>
+    <script src="./js/noDigits.js"></script>
+    <script src="./js/onlyDigits.js"></script>
 </head>
 
 <body>
@@ -65,7 +67,7 @@
                     </div>
                     <div class="content-div">
                         <p>Amount money: </p>
-                        <input type="text" name="" class="authPassword authInp money">
+                        <input type="text" onchange="onlyDigits(this)" class="authPassword authInp money">
                     </div>
                     <div class="content-div">
                         <p>Codeword: </p>
@@ -117,7 +119,7 @@
         </div>
     </div>
 
-    <!-- Модалка добавления категории -->
+    <!-- Модалка добавления шаблона -->
     <div class="modal-wrap" id="modal-pattern">
         <div class="modal-auth">
             <div class="modal-auth-content">
@@ -129,11 +131,11 @@
                     </div>
                     <div class="content-div">
                         <p>Name:</p>
-                        <input type="text" name="" class="authInp name-pattern">
+                        <input type="text" onkeypress="noDigits(event)" class="authInp name-pattern">
                     </div>
                     <div class="content-div">
                         <p>Amount money:</p>
-                        <input type="text" name="" class="authInp value-pattern">
+                        <input type="text" onchange="onlyDigits(this)" class="authInp value-pattern">
                     </div>
                     <button class="loginBtn add-pattern">Add</button>
                     </div>
@@ -151,7 +153,7 @@
                 <form>
                     <div class="content-div">
                         <p>Name:</p>
-                        <input type="text" name="" class="authInp name-category">
+                        <input type="text" onkeypress="noDigits(event)" class="authInp name-category">
                     </div>
                     <button class="loginBtn add-category">Add</button>
                     </div>

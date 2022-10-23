@@ -2,6 +2,19 @@ const abi = [
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "acceptSafeTransfer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "string",
 				"name": "name",
 				"type": "string"
@@ -203,6 +216,19 @@ const abi = [
 	},
 	{
 		"inputs": [],
+		"name": "showAdminsAmount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "showCategories",
 		"outputs": [
 			{
@@ -379,9 +405,9 @@ const abi = [
 						"type": "tuple[]"
 					},
 					{
-						"internalType": "bool",
+						"internalType": "uint256",
 						"name": "status",
-						"type": "bool"
+						"type": "uint256"
 					}
 				],
 				"internalType": "struct Storage.Voting[]",
